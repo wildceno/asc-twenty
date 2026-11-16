@@ -1,0 +1,22 @@
+# Ascendia belge servisi (liste 15a/15b). Twenty'nin ağına (twenty_default) katılır; dışarıya port açmaz.
+# Hesap motoru http://belge-servisi:8090/ adresine şablon dosyasını gönderir. Sır tutmaz.
+name: belge-servisi
+services:
+  belge-servisi:
+    build: .
+    container_name: belge-servisi
+    hostname: belge-servisi
+    user: "${UID_GID:-1000:1000}"
+    read_only: true
+    tmpfs: [/tmp]
+    networks: [twenty]
+    restart: always
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8090/saglik', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+networks:
+  twenty:
+    name: twenty_default
+    external: true

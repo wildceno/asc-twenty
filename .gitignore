@@ -1,0 +1,12 @@
+# Sırlar ve veri asla repoya girmez
+.env
+.env.*
+*.key
+*-api-key*
+.twenty-api-key
+backups/
+*.sql.gz
+*.dump
+*cache*.json
+__pycache__/
+.DS_Store

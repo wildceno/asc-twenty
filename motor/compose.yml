@@ -1,0 +1,52 @@
+# Ascendia hesap motoru. Twenty'nin ağına (twenty_default) katılır; dışarıya port açmaz.
+# Twenty webhook'u http://hesap-motoru:8080/ adresine gönderir (ops/twenty/docker-compose.override.yml izin verir).
+name: hesap-motoru
+services:
+  hesap-motoru:
+    build: .
+    container_name: hesap-motoru
+    hostname: hesap-motoru
+    user: "${UID_GID:-1000:1000}"
+    environment:
+      TWENTY_API_URL: http://server:3000
+      TWENTY_KEY_FILE: /run/sirlar/twenty_api_key
+      WEBHOOK_SECRET_FILE: /run/sirlar/webhook_secret
+      KUR_SAATI: "16:05"
+      # Sistem sağlığı (liste 7): portal adresi boşsa ya da anahtar dosyası boşsa portala gönderim kapalı
+      KURULUM_ADI: "${KURULUM_ADI:-monster-ascendia}"
+      CALISMA_ALANI: "${CALISMA_ALANI:-Ascendia}"
+      PORTAL_URL: "${PORTAL_URL:-}"
+      PORTAL_KEY_FILE: /run/sirlar/portal_key
+      # Enflasyon öngörüsü (liste 14c): TCMB EVDS anahtarı; dosya boşsa TRY öngörüsü alınamaz (alarm)
+      EVDS_KEY_FILE: /run/sirlar/evds_key
+      # USD öngörüsü: FRED API anahtarı; dosya boşsa USD öngörüsü alınamaz (alarm)
+      FRED_KEY_FILE: /run/sirlar/fred_key
+      # DocuSign (liste 20): ayar (sır değil) ve JWT özel anahtarı; ayar boşsa IMZA paketi gönderim yapmaz
+      DOCUSIGN_AYAR_FILE: /run/sirlar/docusign.json
+      DOCUSIGN_KEY_FILE: /run/sirlar/docusign_key
+      # Paraşüt (liste 21): ayar, istemci sırrı (salt okunur) ve oturum klasörü (yenileme belirteci döner → yazılabilir)
+      PARASUT_AYAR_FILE: /run/sirlar/parasut.json
+      PARASUT_SECRET_FILE: /run/sirlar/parasut_secret
+      PARASUT_OTURUM_FILE: /run/parasut/oturum.json
+    volumes:
+      - ${HOME}/twenty/.twenty-api-key:/run/sirlar/twenty_api_key:ro
+      - ${HOME}/twenty/.hesap-motoru-webhook-secret:/run/sirlar/webhook_secret:ro
+      - ${HOME}/twenty/.crm-support-anahtari:/run/sirlar/portal_key:ro
+      - ${HOME}/twenty/.evds-anahtari:/run/sirlar/evds_key:ro
+      - ${HOME}/twenty/.fred-anahtari:/run/sirlar/fred_key:ro
+      - ${HOME}/twenty/.docusign.json:/run/sirlar/docusign.json:ro
+      - ${HOME}/twenty/.docusign-private-key:/run/sirlar/docusign_key:ro
+      - ${HOME}/twenty/.parasut.json:/run/sirlar/parasut.json:ro
+      - ${HOME}/twenty/.parasut-client-secret:/run/sirlar/parasut_secret:ro
+      - ${HOME}/twenty/parasut:/run/parasut
+    networks: [twenty]
+    restart: always
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/saglik', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+networks:
+  twenty:
+    name: twenty_default
+    external: true

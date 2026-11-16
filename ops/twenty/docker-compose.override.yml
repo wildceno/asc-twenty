@@ -1,0 +1,22 @@
+# Twenty compose'una ek (sunucuda ~/twenty/docker-compose.override.yml olarak durur; compose otomatik birleştirir).
+# Webhook'ların iç ağdaki hesap motoruna gidebilmesi için (SSRF koruması varsayılan olarak engelliyor).
+# Gmail / Google Takvim eşitleme (liste 19): değerler ~/twenty/.env'den (ops/google-kur.sh yazar); boşsa kapalı.
+x-google: &google
+  AUTH_GOOGLE_CLIENT_ID: ${AUTH_GOOGLE_CLIENT_ID:-}
+  AUTH_GOOGLE_CLIENT_SECRET: ${AUTH_GOOGLE_CLIENT_SECRET:-}
+  AUTH_GOOGLE_CALLBACK_URL: ${AUTH_GOOGLE_CALLBACK_URL:-}
+  AUTH_GOOGLE_APIS_CALLBACK_URL: ${AUTH_GOOGLE_APIS_CALLBACK_URL:-}
+  MESSAGING_PROVIDER_GMAIL_ENABLED: ${MESSAGING_PROVIDER_GMAIL_ENABLED:-false}
+  CALENDAR_PROVIDER_GOOGLE_ENABLED: ${CALENDAR_PROVIDER_GOOGLE_ENABLED:-false}
+# Twenty içi AI sohbeti (Claude): anahtar ~/twenty/.env'den (ops/ai-kur.sh yazar); boşsa sağlayıcı yok.
+x-ai: &ai
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+services:
+  server:
+    environment:
+      OUTBOUND_HTTP_ALLOWED_INTERNAL_HOSTS: hesap-motoru
+      <<: [*google, *ai]
+  worker:
+    environment:
+      OUTBOUND_HTTP_ALLOWED_INTERNAL_HOSTS: hesap-motoru
+      <<: [*google, *ai]

@@ -1,0 +1,83 @@
+import { defineObject, FieldType } from 'twenty-sdk/define';
+
+import {
+  SAGLIK_A_CODE,
+  SAGLIK_A_COUNT,
+  SAGLIK_A_DETAIL,
+  SAGLIK_A_FIRST,
+  SAGLIK_A_KEY,
+  SAGLIK_A_LAST,
+  SAGLIK_A_NAME,
+  SAGLIK_A_OBJ,
+  SAGLIK_A_RESOLVED,
+  SAGLIK_A_SEV,
+  SAGLIK_A_SOURCE,
+  SAGLIK_A_STATUS,
+  SAGLIK_A_TASK,
+} from 'src/constants/universal-identifiers';
+
+// Sistem Alarmları (Yönetim): hesap motoru açar ve kapatır. Aynı sorun (Tekil Anahtar) yeni kayıt açmaz,
+// tekrar sayısını artırır. Kodlar ve seviyeler: kararlar/2026-11-13-crm-support-portali.md (portala da aynı olay gider).
+export default defineObject({
+  universalIdentifier: SAGLIK_A_OBJ,
+  nameSingular: 'systemAlarm',
+  namePlural: 'systemAlarms',
+  labelSingular: 'Sistem Alarmı',
+  labelPlural: 'Sistem Alarmları',
+  description: 'Hesap motorunun açtığı sağlık ve arıza alarmları; sorun kalkınca Düzeldi olur.',
+  icon: 'IconAlarm',
+  labelIdentifierFieldMetadataUniversalIdentifier: SAGLIK_A_NAME,
+  fields: [
+    { universalIdentifier: SAGLIK_A_NAME, type: FieldType.TEXT, name: 'name', label: 'Başlık', icon: 'IconTag' },
+    { universalIdentifier: SAGLIK_A_CODE, type: FieldType.TEXT, name: 'code', label: 'Kod', icon: 'IconHash', isUIEditable: false },
+    {
+      universalIdentifier: SAGLIK_A_SEV,
+      type: FieldType.SELECT,
+      name: 'severity',
+      label: 'Seviye',
+      icon: 'IconFlag',
+      isUIEditable: false,
+      options: [
+        { value: 'KRITIK', label: 'Kritik', position: 0, color: 'red' },
+        { value: 'UYARI', label: 'Uyarı', position: 1, color: 'orange' },
+        { value: 'BILGI', label: 'Bilgi', position: 2, color: 'gray' },
+      ],
+    },
+    {
+      universalIdentifier: SAGLIK_A_SOURCE,
+      type: FieldType.SELECT,
+      name: 'source',
+      label: 'Kaynak',
+      icon: 'IconServer',
+      isUIEditable: false,
+      options: [
+        { value: 'MOTOR', label: 'Hesap motoru', position: 0, color: 'blue' },
+        { value: 'TWENTY', label: 'Twenty', position: 1, color: 'purple' },
+        { value: 'KUR', label: 'Döviz kuru', position: 2, color: 'yellow' },
+        { value: 'YEDEK', label: 'Yedek', position: 3, color: 'turquoise' },
+        { value: 'IS_AKISI', label: 'İş akışı', position: 4, color: 'sky' },
+        { value: 'GUVENLIK', label: 'Güvenlik', position: 5, color: 'red' },
+        { value: 'ENFLASYON', label: 'Enflasyon öngörüsü', position: 6, color: 'orange' },
+      ],
+    },
+    {
+      universalIdentifier: SAGLIK_A_STATUS,
+      type: FieldType.SELECT,
+      name: 'alarmStatus',
+      label: 'Durum',
+      icon: 'IconProgress',
+      isUIEditable: false,
+      options: [
+        { value: 'OPEN', label: 'Açık', position: 0, color: 'red' },
+        { value: 'RESOLVED', label: 'Düzeldi', position: 1, color: 'green' },
+      ],
+    },
+    { universalIdentifier: SAGLIK_A_KEY, type: FieldType.TEXT, name: 'uniqueKey', label: 'Tekil Anahtar', icon: 'IconKey', isUIEditable: false },
+    { universalIdentifier: SAGLIK_A_DETAIL, type: FieldType.TEXT, name: 'detail', label: 'Ayrıntı', icon: 'IconFileText', isUIEditable: false },
+    { universalIdentifier: SAGLIK_A_FIRST, type: FieldType.DATE_TIME, name: 'firstSeenAt', label: 'İlk Görülme', icon: 'IconClock', isUIEditable: false },
+    { universalIdentifier: SAGLIK_A_LAST, type: FieldType.DATE_TIME, name: 'lastSeenAt', label: 'Son Görülme', icon: 'IconClock', isUIEditable: false },
+    { universalIdentifier: SAGLIK_A_RESOLVED, type: FieldType.DATE_TIME, name: 'resolvedAt', label: 'Düzelme Zamanı', icon: 'IconCircleCheck', isUIEditable: false },
+    { universalIdentifier: SAGLIK_A_COUNT, type: FieldType.NUMBER, name: 'repeatCount', label: 'Tekrar', icon: 'IconRepeat', isUIEditable: false },
+    { universalIdentifier: SAGLIK_A_TASK, type: FieldType.TEXT, name: 'taskId', label: 'Görev (sistem)', icon: 'IconCheckbox', isUIEditable: false },
+  ],
+});
