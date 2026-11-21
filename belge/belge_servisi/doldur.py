@@ -18,6 +18,7 @@ from belge_servisi import akis
 from belge_servisi.oku import YER_TUTUCU, OkumaHatasi, bicim_bul, docx_bolumleri, docx_ust_alt, pptx_bolumleri
 
 OTOMATIK = {"kalem_tablosu", "urun_aciklamalari", "icerik"}
+DUZEN = {"bosluk", "sayfa_sonu"}   # düzen işaretleri (16 Kas): akışta akis.py, Word'de doldur_docx işler
 CAPA = "/imza/"   # DocuSign imza çapası (motor {{imza}} için yazar); belgede beyaz, görünmez (liste 20)
 
 
@@ -76,6 +77,8 @@ class Degerler:
     def __call__(self, ad):
         if ad in self.d:
             return self.d[ad].replace("\n", self.cok_satir)
+        if ad in DUZEN:
+            return ""
         if ad not in self.eksik:
             self.eksik.append(ad)
         return ""
@@ -161,6 +164,14 @@ def doldur_docx(veri, girdi):
                     continue
                 oge.getparent().remove(oge)
     from docx.shared import RGBColor as DocxRGB
+    from docx.enum.text import WD_BREAK
+    for p in list(_docx_paragraflar(belge)):   # düzen işaretleri: {{sayfa_sonu}} → sayfa sonu, {{bosluk}} → boş satır
+        if "{{sayfa_sonu}}" in p.text.replace(" ", ""):
+            _isaret_sil(p.runs, "sayfa_sonu")
+            p.add_run().add_break(WD_BREAK.PAGE)
+        if "{{bosluk}}" in p.text.replace(" ", ""):
+            _isaret_sil(p.runs, "bosluk")
+            p.add_run().add_break()
     deger = Degerler(girdi.get("degerler"))
     for p in list(_docx_paragraflar(belge)) + list(docx_ust_alt(belge)):
         parcalarda_degistir(p.runs, deger)

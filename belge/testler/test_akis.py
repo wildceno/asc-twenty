@@ -55,6 +55,19 @@ class Akis(unittest.TestCase):
         s = uret(pptx_akis_ornek(), {"degerler": {"musteri_adi": "X", "teklif_no": "1"}, "bolum_sayisi": 3, "akis": []})
         self.assertEqual(len(Presentation(io.BytesIO(s["belge"])).slides), 2)
 
+    def test_duzen_isaretleri(self):
+        """{{bosluk}} bir satır boşluk, {{sayfa_sonu}} yeni sayfa; bölüm başlığı sayfa başında boşluksuz (16 Kas)."""
+        b = [{"baslik": "Bir", "tur": "metin", "metin": "Satır A\n{{bosluk}}\nSatır B {{ sayfa_sonu }}Satır C"},
+             {"baslik": "İki", "tur": "metin", "metin": "Satır D"}]
+        sayfalar = sayfala(b, 600, 400, 12)
+        self.assertEqual(len(sayfalar), 2)
+        ilk = [v["satirlar"] for _, v, _ in sayfalar[0]]
+        self.assertEqual(ilk, [["Bir"], ["Satır A"], [""], ["Satır B"]])
+        ikinci = sayfalar[1]
+        self.assertEqual([v["satirlar"] for _, v, _ in ikinci], [["Satır C"], ["İki"], ["Satır D"]])
+        self.assertEqual(ikinci[1][1]["once"], 24)     # sayfa ortasındaki bölüm başlığı: bölüm arası boşluk
+        self.assertEqual(sayfalar[0][0][1]["once"], 0)  # sayfanın ilk başlığı: boşluk yok
+
 
 if __name__ == "__main__":
     unittest.main()

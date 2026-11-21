@@ -32,6 +32,8 @@ CRM_ALANLARI = {
 }
 OTOMATIK = {"kalem_tablosu": ("LINE_TABLE", "Otomatik bölüm: kalem tablosu (kalem, miktar, birim fiyat, indirim, tutar)"),
             "urun_aciklamalari": ("PRODUCT_DESCRIPTIONS", "Otomatik bölüm: kalemlerin katalogdaki detay açıklamaları")}
+DUZEN = {"bosluk": "Bir satır boşluk bırakır (içerik bölümü metninde ya da Word şablonunda ayrı satıra yazılır)",
+         "sayfa_sonu": "Devamı yeni sayfadan / slayttan başlar (ayrı satıra yazılır)"}
 KULLANICI_SECIMI = ("sectionType", "autoContent", "removable", "defaultText")
 # Akış şablonu (liste 15c): {{icerik}} içerik slaytını işaretler; içerik bölümleri dosyadan değil CRM'den tanımlanır
 AKIS = "icerik"
@@ -74,7 +76,7 @@ def bolum_turu(yer_tutucular):
     for y in yer_tutucular:
         if y in OTOMATIK:
             return "AUTO", OTOMATIK[y][0]
-    if any(y not in CRM_ALANLARI and y not in OTOMATIK for y in yer_tutucular):
+    if any(y not in CRM_ALANLARI and y not in OTOMATIK and y not in DUZEN for y in yer_tutucular):
         return "FILL", None
     return "FIXED", None
 
@@ -95,6 +97,8 @@ def yer_tutucu_listesi(sonuc=None):
             tur, aciklama = "crm", CRM_ALANLARI[y]
         elif y in OTOMATIK:
             tur, aciklama = "otomatik", OTOMATIK[y][1]
+        elif y in DUZEN:
+            tur, aciklama = "duzen", DUZEN[y]
         elif y == AKIS:
             tur, aciklama = "akis", "İçerik alanı: CRM'de tanımlanan içerik bölümleri buraya yazılır, slayt gerektikçe çoğaltılır"
         else:
@@ -103,6 +107,9 @@ def yer_tutucu_listesi(sonuc=None):
     for y, aciklama in CRM_ALANLARI.items():
         if y not in nerede:
             out.append({"ad": y, "tur": "crm", "aciklama": aciklama, "bolumler": []})
+    for y, aciklama in DUZEN.items():
+        if y not in nerede:
+            out.append({"ad": y, "tur": "duzen", "aciklama": aciklama, "bolumler": []})
     for y, (_, aciklama) in OTOMATIK.items():
         if y not in nerede:
             out.append({"ad": y, "tur": "otomatik", "aciklama": aciklama, "bolumler": []})

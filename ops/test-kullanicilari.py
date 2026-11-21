@@ -24,6 +24,7 @@ KULLANICILAR = [  # (rol, e-posta parçası, ad, soyad, Ekip görevi)
     ("Yönetici", "yonetici", "Test", "Yönetici", "MANAGER"),
     ("Support", "support", "Test", "Support", "SUPPORT"),
     ("Pazarlama", "pazarlama", "Test", "Pazarlama", "MARKETING"),
+    ("Admin", "admin", "Test", "Admin", None),   # yalnız video çekimi için (16 Kas), çekimler bitince silinecek
 ]
 
 

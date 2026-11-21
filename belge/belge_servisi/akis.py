@@ -7,6 +7,7 @@ satır yüksekliği ≈ 1,25 × yazı boyutu. Tahmin bilinçli olarak temkinlidi
 Uzun tablo sayfalar arasında bölünür, başlık satırı her sayfada tekrarlanır.
 """
 import copy
+import re
 
 from pptx.dml.color import RGBColor
 from pptx.util import Emu, Pt
@@ -16,6 +17,9 @@ KARAKTER_ORANI = 0.47      # ortalama karakter genişliği / yazı boyutu (Libre
 SATIR = 1.25               # satır yüksekliği / yazı boyutu
 TABLO_YAZI = 9
 TABLO_DOLGU = 9           # hücre üst + alt iç boşluğu (pt); satır yüksekliği tabloya açıkça yazılır
+BOLUM_ARASI = 24          # bölüm başlığından önceki boşluk (pt; sayfanın ilk bölümünde uygulanmaz) — kullanıcı 16 Kas
+BASLIK_SONRASI = 8        # başlık ile içeriği arasındaki boşluk (pt)
+BOSLUK, SAYFA_SONU = "{{bosluk}}", "{{sayfa_sonu}}"   # bölüm metninde: bir satır boşluk / yeni sayfadan devam
 
 
 def akis_slayti(sunum):
@@ -90,6 +94,21 @@ class Duzen:
             if satirlar:
                 self._yeni()
 
+    def bosluk(self, satir=1):
+        """Bir satır yüksekliğinde boşluk; sayfa başında yok sayılır, sığmazsa sayfa geçer."""
+        h = SATIR * self.b * satir
+        if not self.sayfa:
+            return
+        if self._kalan() < h:
+            self._yeni()
+            return
+        self.sayfa.append(("metin", {"satirlar": [""], "boyut": self.b, "kalin": False, "once": 0.0}, h))
+        self.y += h
+
+    def sayfa_sonu(self):
+        if self.sayfa:
+            self._yeni()
+
     def tablo(self, tablo):
         sutun = len(tablo["basliklar"])
         karakter = max(4, int(self.g / sutun / (KARAKTER_ORANI * TABLO_YAZI)))
@@ -128,11 +147,20 @@ def sayfala(bloklar, genislik_pt, yukseklik_pt, boyut):
     d = Duzen(genislik_pt, yukseklik_pt, boyut)
     for b in bloklar:
         if b.get("baslik"):
-            d.paragraf(b["baslik"], boyut + 4, kalin=True, once=10, sonra=6, baslik=True)
+            d.paragraf(b["baslik"], boyut + 4, kalin=True, once=BOLUM_ARASI, sonra=BASLIK_SONRASI, baslik=True)
         if b["tur"] == "metin":
-            for i, satir in enumerate((b.get("metin") or "").split("\n")):   # her satır sonu ayrı paragraf
-                if satir.strip():
-                    d.paragraf(satir.strip(), boyut, once=6 if i and not (b["metin"].split("\n")[i - 1].strip()) else 0, sonra=3)
+            metin = re.sub(r"\{\{\s*(bosluk|sayfa_sonu)\s*\}\}", lambda m: "\n{{" + m.group(1) + "}}\n", b.get("metin") or "")
+            satirlar = metin.split("\n")
+            onceki_bos = False
+            for satir in satirlar:   # her satır sonu ayrı paragraf
+                satir = satir.strip()
+                if satir == BOSLUK:
+                    d.bosluk()
+                elif satir == SAYFA_SONU:
+                    d.sayfa_sonu()
+                elif satir:
+                    d.paragraf(satir, boyut, once=6 if onceki_bos else 0, sonra=3)
+                onceki_bos = not satir
         elif b["tur"] == "tablo" and b.get("tablo"):
             d.tablo(b["tablo"])
         elif b["tur"] == "aciklamalar":
@@ -249,6 +277,12 @@ def uygula(sunum, bloklar):
         def bosalt():
             nonlocal cy, metinler, metin_h
             if metinler:
+                # Yeni kutunun ilk paragrafındaki üst boşluğu PowerPoint / LibreOffice uygulamıyor (16 Kas, tablodan
+                # sonra başlık yapışıktı): boşluk kutunun konumuna eklenir
+                if cy > y and metinler[0][3]:
+                    cy += Emu(Pt(metinler[0][3]))
+                    metin_h -= metinler[0][3]
+                    metinler[0] = metinler[0][:3] + (0.0,)
                 _metin_kutusu(slayt, x, cy, g, Emu(Pt(metin_h)), metinler, yazi)
                 cy += Emu(Pt(metin_h))
                 metinler, metin_h = [], 0.0

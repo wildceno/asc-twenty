@@ -14,7 +14,7 @@ import urllib.request
 from ascendia_motor.cekirdek.ayar import API, TR
 from ascendia_motor.cekirdek.gunluk import log
 from ascendia_motor.cekirdek.twenty import api, gql, liste
-from ascendia_motor.paketler.sablon import (AKIS, BELGE_URL, CRM_ALANLARI, OTOMATIK, crm_bolumu_mu, dosya_indir,
+from ascendia_motor.paketler.sablon import (AKIS, BELGE_URL, CRM_ALANLARI, DUZEN, OTOMATIK, crm_bolumu_mu, dosya_indir,
                                             varsayilan_sablon)
 from ascendia_motor.paketler.teklif_hesap import para, sayilan_kalemler
 
@@ -80,7 +80,7 @@ def doldurulacak_varsayilanlari(bolumler):
     for b in bolumler:
         if b.get("sectionType") != "FILL" or not b.get("defaultText"):
             continue
-        bilinmeyen = [y for y in (b.get("placeholders") or []) if y not in CRM_ALANLARI and y not in OTOMATIK]
+        bilinmeyen = [y for y in (b.get("placeholders") or []) if y not in CRM_ALANLARI and y not in OTOMATIK and y not in DUZEN]
         if len(bilinmeyen) == 1:
             out.setdefault(bilinmeyen[0], b["defaultText"])
     return out
@@ -94,7 +94,8 @@ def akis_bloklari(icerik_bolumleri, haric, doldurulan, degerler, tablo, aciklama
     Sabit: bölüm metni; teklifte doldurulur: satışçının metni (yoksa varsayılan); otomatik: kalem tablosu / açıklamalar.
     Metindeki {{yer_tutucu}} CRM değeriyle değişir (bilinmeyen boş kalır)."""
     def coz(metin):
-        return YER_TUTUCU.sub(lambda m: str(degerler.get(m.group(1).strip(), "")), metin or "")
+        return YER_TUTUCU.sub(lambda m: m.group(0) if m.group(1).strip() in DUZEN
+                              else str(degerler.get(m.group(1).strip(), "")), metin or "")
     out = []
     for b in sorted(icerik_bolumleri, key=lambda x: x.get("sortOrder") or 0):
         if b.get("removable") and int(b.get("sortOrder") or 0) in haric:

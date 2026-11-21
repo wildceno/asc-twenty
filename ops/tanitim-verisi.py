@@ -5,6 +5,8 @@ uzantısıdır (gerçek kurum değildir). Canlı DocuSign / e-posta gösterimi i
 TANITIM_IMZACI_EPOSTA ortam değişkeniyle gerçek bir deneme kutusuna yönlendirilebilir.
 Ortam: TANITIM_SAHIP (fırsat sahibi üyenin adı; boşsa adı "Test" ile başlamayan ilk üye), TANITIM_IMZACI_EPOSTA.
 
+Lead aşamalarında tutar 1 USD (değer henüz bilinmez). Zenginleştirme (katalog, temas, not, görev, rakip, hedef):
+ops/tanitim-zenginlestir.py sonunda çağrılır.
 Süreçler: her aşamada fırsat (Lead-Gen → DSQ), aşama geçmişi, teklif (katalog + teklife özel kalem, şablon, PDF),
 marj onayı (Ege Gıda saha teklifi), kanal ortağı payı, kabul → sipariş belgesi → Audit (sözleşme) → Delivery → Invoice → Won, temaslar (arama,
 e-posta, toplantı, LinkedIn), ileri tarihli toplantı (planlı görüşme), temassız fırsat, rakip sözleşmesi yenilemesi,
@@ -126,9 +128,9 @@ ORTAK = yeni("partners", "partner", {"name": "Anadolu İş Ortakları Danışman
 # ---------------- fırsatlar ----------------
 # (ad, şirket, sahip, hedef aşama, kaynak, ICP, kapanış (gün), muhatap, teklif tanımı ya da elle tutar)
 FIRSATLAR = [
-    ("Lale Perakende - Mağaza satış eğitimi", "Lale Perakende", SATIS, "LEAD_GEN", "INBOUND", "HIGH", 75, "Ceren Yalçın", {"tek": 12000}),
-    ("Vadi İnşaat - Bayi satış koçluğu", "Vadi İnşaat Malzemeleri", SATIS, "LEAD_GEN", "OUTBOUND", "MEDIUM", 90, "Tolga Kurt", {"aylik": 2000, "ay": 6}),
-    ("Nova Telekom - Kurumsal satış süreci", "Nova Telekom Hizmetleri", SAHIP, "LEAD_IN_TOUCH", "EVENT", "HIGH", 70, "Onur Yıldız", {"tek": 18000}),
+    ("Lale Perakende - Mağaza satış eğitimi", "Lale Perakende", SATIS, "LEAD_GEN", "INBOUND", "HIGH", 75, "Ceren Yalçın", {"tek": 1}),
+    ("Vadi İnşaat - Bayi satış koçluğu", "Vadi İnşaat Malzemeleri", SATIS, "LEAD_GEN", "OUTBOUND", "MEDIUM", 90, "Tolga Kurt", {"tek": 1}),
+    ("Nova Telekom - Kurumsal satış süreci", "Nova Telekom Hizmetleri", SAHIP, "LEAD_IN_TOUCH", "EVENT", "HIGH", 70, "Onur Yıldız", {"tek": 1}),
     ("Toros Otomotiv - Satış koçluğu 6 ay", "Toros Otomotiv Yan Sanayi", SAHIP, "PIPELINE", "REFERRAL", "HIGH", 45, "Serkan Polat", "toros"),
     ("Ege Gıda - Saha satış eğitimi", "Ege Gıda Sanayi", SATIS, "PIPELINE", "OUTBOUND", "MEDIUM", 60, "Hakan Öztürk", "ege"),
     ("Pera Finans - Satış ve CRM danışmanlığı", "Pera Finans Teknolojileri", SAHIP, "UPSIDE", "CHANNEL", "HIGH", 30, "Can Erdem", "pera"),
@@ -287,4 +289,6 @@ for uye, ad, gelir, brut in [(SAHIP, f"{SAHIP_AD} Q4 2026", 90000, 45000), (SATI
     h = yeni("targets", "target", {"name": ad, "memberId": uye, "periodId": Q4, "targetRole": "PERSONAL"})
     yeni("targetLines", "targetLine", {"name": f"{ad} - Gelir", "targetId": h, "metric": "REVENUE", "targetAmount": para(gelir, "USD"), "weightPercent": 70})
     yeni("targetLines", "targetLine", {"name": f"{ad} - Brüt kâr", "targetId": h, "metric": "GROSS_PROFIT", "targetAmount": para(brut, "USD"), "weightPercent": 30})
+import subprocess  # noqa: E402
+subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tanitim-zenginlestir.py")], check=True)
 print("TANITIM-TAMAM")

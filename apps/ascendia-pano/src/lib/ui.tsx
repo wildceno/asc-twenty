@@ -309,11 +309,12 @@ export const AsamaGrafigi = ({
   // Üstte değer etiketi için %12 boşluk
   const y = scaleLinear().domain([0, max]).nice().range([0, 88]);
   const ticks = y.ticks(4).filter((t) => max < 5 || Number.isInteger(t));
-  const YUKSEKLIK = 190;
   const SOL = 48;
+  // Sütun alanı widget'ın kalan yüksekliğini alır (Kabuk başlığı ~28 px), eğik aşama adları (78 px) kutuda kalır
+  // (16 Kas: küçük widget'ta adlar kesiliyordu; sabit 190 px yerine esnek, en az 100 px)
   return (
-    <div style={{ fontFamily: T.font }}>
-      <div style={{ position: 'relative', height: YUKSEKLIK, marginLeft: SOL }}>
+    <div style={{ fontFamily: T.font, height: 'calc(100% - 28px)', minHeight: 178, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', flex: 1, minHeight: 100, marginLeft: SOL }}>
         {ticks.map((t) => (
           <div key={t} style={{ position: 'absolute', left: 0, right: 0, bottom: yuzde(y(t)), borderTop: `1px solid ${T.borderLight}` }}>
             <span style={{ position: 'absolute', right: '100%', marginRight: 6, transform: 'translateY(-50%)', fontSize: 11, color: T.fg3, whiteSpace: 'nowrap' }}>
@@ -334,7 +335,7 @@ export const AsamaGrafigi = ({
           ))}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: '3%', padding: '0 1%', marginLeft: SOL, height: 78 }}>
+      <div style={{ display: 'flex', gap: '3%', padding: '0 1%', marginLeft: SOL, height: 78, flexShrink: 0 }}>
         {data.map((d) => (
           <div key={d.value} style={{ flex: 1, position: 'relative' }}>
             <div

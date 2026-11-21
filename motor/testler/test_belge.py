@@ -55,6 +55,9 @@ class Belge(unittest.TestCase):
         self.assertEqual(out[0]["metin"], "Örnek için hazırlandı.")
         self.assertEqual(out[1]["metin"], "Satışçı metni")
         self.assertEqual(akis_bloklari(b[2:3], set(), {}, {}, None, [])[0]["metin"], "Varsayılan")
+        # düzen işaretleri korunur, belge servisi işler (16 Kas)
+        d = [{"id": "9", "name": "D", "sortOrder": 101, "sectionType": "FIXED", "defaultText": "A\n{{bosluk}}\n{{ sayfa_sonu }}\n{{x}}B"}]
+        self.assertEqual(akis_bloklari(d, set(), {}, {}, None, [])[0]["metin"], "A\n{{bosluk}}\n{{ sayfa_sonu }}\nB")
 
 
 if __name__ == "__main__":

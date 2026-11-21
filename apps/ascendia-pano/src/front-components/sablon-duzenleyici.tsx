@@ -10,7 +10,7 @@ import { Kabuk, T } from 'src/lib/ui';
 // Şablon düzenleyici (liste 15a; plan: kararlar/2026-11-13-teklif-modulu-plan.md, 15a kararları). Teklif Şablonu kayıt
 // sayfasında "Şablon" sekmesi. Dosyayı belge servisi okur, bölümleri hesap motoru yazar; burada bölüm türü, otomatik
 // içerik, kaldırılabilirlik ve varsayılan metin düzenlenir, şablon aktif / varsayılan yapılır. Yer tutucu sözlüğü motordan.
-type YerTutucu = { ad: string; tur: 'crm' | 'otomatik' | 'doldurulacak' | 'akis'; aciklama: string; bolumler: string[] };
+type YerTutucu = { ad: string; tur: 'crm' | 'otomatik' | 'doldurulacak' | 'akis' | 'duzen'; aciklama: string; bolumler: string[] };
 // Motorla aynı (paketler/sablon.py): CRM'de tanımlanan içerik bölümü işareti ve sıra başlangıcı
 const CRM_BOLUMU = 'CRM (içerik bölümü)';
 const CRM_SIRA = 100;
@@ -28,7 +28,7 @@ const DURUM: Record<string, string> = { DRAFT: 'Taslak', ACTIVE: 'Aktif', PASSIV
 const TUR: Record<string, string> = { FIXED: 'Sabit (şablondan)', FILL: 'Teklifte doldurulur', AUTO: 'Otomatik (tekliften)' };
 const OTO: Record<string, string> = { LINE_TABLE: 'Kalem tablosu', PRODUCT_DESCRIPTIONS: 'Ürün açıklamaları' };
 const YT_GRUP: [YerTutucu['tur'], string][] = [
-  ['crm', 'CRM\'den dolar'], ['otomatik', 'Otomatik bölüm işaretleri'], ['akis', 'Akış şablonu (PowerPoint içerik slaytı)'], ['doldurulacak', 'Teklifte satışçı doldurur (tanınmayan)'],
+  ['crm', 'CRM\'den dolar'], ['otomatik', 'Otomatik bölüm işaretleri'], ['akis', 'Akış şablonu (PowerPoint içerik slaytı)'], ['duzen', 'Düzen (boşluk, sayfa sonu)'], ['doldurulacak', 'Teklifte satışçı doldurur (tanınmayan)'],
 ];
 
 const deger = (e: unknown) => {

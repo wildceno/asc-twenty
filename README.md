@@ -1,6 +1,6 @@
-# Asc-Twenty
+# Wintra CRM
 
-A B2B sales CRM built on self-hosted [Twenty](https://twenty.com) — **without forking Twenty's core**.
+**Wintra CRM by Ascendia, built on Twenty.** A B2B sales CRM built on self-hosted [Twenty](https://twenty.com), the open-source CRM — **without forking Twenty's core**.
 Everything is added through Twenty's Metadata API, REST API, webhooks and the Twenty app framework, so Twenty
 can be upgraded independently.
 
@@ -54,12 +54,14 @@ Secrets are never stored in the repository: every key is read from a `600` file 
 
 ## Status
 
-Working on a self-hosted development instance with demo data. Not affiliated with Twenty.com PBC.
+Working on a self-hosted development instance with demo data.
+
+Wintra CRM is an Ascendia product, not a Twenty product, and is supported by Ascendia, not by Twenty. Ascendia is a member of the Twenty Integrator program; it is not otherwise affiliated with Twenty.com PBC. The Twenty name and logo belong to Twenty.
 
 ## About Ascendia
 
 [Ascendia](https://ascendia.com.tr) helps B2B teams build a repeatable sales process: sales training, coaching and
-CRM implementation on Twenty. Need Asc-Twenty set up for your team? Visit **[ascendia.com.tr](https://ascendia.com.tr)**.
+CRM implementation on Twenty. Need Wintra CRM set up for your team? Visit **[ascendia.com.tr](https://ascendia.com.tr)**.
 
 ## License
 
